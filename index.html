@@ -2,71 +2,86 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1612">
 <title>Comeback Tracker</title>
 <style>
-:root{--bg:#1a1612;--card:#242018;--accent:#c9a86a;--accent2:#7a9a6e;--text:#ece6da;--muted:#a89c87;--border:#3a342a;}
-*{box-sizing:border-box;}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);padding:16px;padding-bottom:80px;}
-h1{font-size:20px;margin:4px 0 2px;color:var(--accent);}
-.sub{color:var(--muted);font-size:13px;margin-bottom:14px;}
-.maintabs{display:flex;gap:6px;margin-bottom:16px;position:sticky;top:0;background:var(--bg);padding:4px 0 10px;z-index:10;}
-.maintab{flex:1;text-align:center;background:var(--card);border:1px solid var(--border);color:var(--muted);padding:9px 2px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;}
-.maintab.active{background:var(--accent);color:#1a1612;border-color:var(--accent);}
+:root{--bg:#1a1612;--card:#242018;--accent:#c9a86a;--accent2:#7a9a6e;--text:#ece6da;--muted:#a89c87;--border:#3a342a;--navh:64px;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{touch-action:manipulation;}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);
+  padding:16px;padding-top:calc(16px + env(safe-area-inset-top));
+  padding-bottom:calc(var(--navh) + 28px + env(safe-area-inset-bottom));
+  overscroll-behavior-y:contain;-webkit-text-size-adjust:100%;}
+h1{font-size:21px;margin:4px 0 2px;color:var(--accent);}
+.sub{color:var(--muted);font-size:13px;margin-bottom:10px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.linkbtn{font-size:12px;color:var(--accent);padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);display:inline-block;}
+.linkbtn:active{opacity:.7;}
+.maintabs{position:fixed;left:0;right:0;bottom:0;display:flex;gap:4px;background:var(--card);border-top:1px solid var(--border);padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:50;}
+.maintab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;padding:4px 2px;border-radius:12px;color:var(--muted);font-size:11px;font-weight:600;}
+.maintab .ic{font-size:21px;line-height:1;}
+.maintab.active{background:rgba(201,168,106,.14);color:var(--accent);}
+.maintab:active{opacity:.7;}
 .view{display:none;}.view.active{display:block;}
-.stabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px;}
-.tab{flex:0 0 auto;background:var(--card);border:1px solid var(--border);color:var(--muted);padding:7px 12px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap;}
+.stabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:12px;padding-bottom:4px;}
+.tab{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-height:44px;background:var(--card);border:1px solid var(--border);color:var(--muted);padding:0 16px;border-radius:10px;font-size:14px;white-space:nowrap;}
 .tab.active{background:var(--accent2);color:#1a1612;border-color:var(--accent2);font-weight:600;}
+.tab:active{opacity:.8;}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
-.erow{display:grid;grid-template-columns:1fr;gap:6px;padding:10px 0;border-bottom:1px solid var(--border);}
+.erow{display:grid;grid-template-columns:1fr;gap:6px;padding:12px 0;border-bottom:1px solid var(--border);}
 .erow:last-child{border-bottom:none;}
-.en{font-size:15px;font-weight:600;}.et{font-size:12px;color:var(--accent2);margin-bottom:2px;}
-.einp{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-.einp input,.sinp{background:#161310;border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-size:14px;width:64px;}
-.einp span{font-size:12px;color:var(--muted);}
-.lbtn{background:var(--accent2);color:#1a1612;border:none;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;}
-.ll{font-size:12px;color:var(--muted);margin-top:4px;}
-.stitle{font-size:16px;margin:18px 0 8px;color:var(--accent);}
-.meal{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.en{font-size:16px;font-weight:600;}.et{font-size:13px;color:var(--accent2);margin-bottom:2px;}
+.setgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0;}
+.sfield{display:flex;flex-direction:column;gap:5px;}
+.sflbl{font-size:10px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;text-align:center;}
+.sfield input{width:100%;text-align:center;}
+.setrow5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 4px;}
+.scell{display:flex;flex-direction:column;gap:5px;}
+.scell input{width:100%;text-align:center;padding:10px 2px;}
+input[type=number],input[type=text],textarea{background:#161310;border:1px solid var(--border);color:var(--text);padding:12px 10px;border-radius:8px;font-size:16px;min-height:44px;}
+input:focus,textarea:focus{outline:1px solid var(--accent2);}
+.lbtn{background:var(--accent2);color:#1a1612;border:none;padding:12px 16px;border-radius:8px;font-size:15px;font-weight:600;min-height:46px;width:100%;}
+.lbtn:active{opacity:.8;}
+.ll{font-size:13px;color:var(--muted);margin-top:4px;}
+.stitle{font-size:17px;margin:20px 0 8px;color:var(--accent);}
+.meal{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
 .meal:last-child{border:none;margin:0;padding:0;}
-.ml{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent2);font-weight:600;margin-bottom:3px;}
-.mt{font-size:15px;line-height:1.4;}
-.item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;cursor:pointer;}
-.item input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent2);flex-shrink:0;}
+.ml{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent2);font-weight:600;margin-bottom:3px;}
+.mt{font-size:16px;line-height:1.45;}
+.item{display:flex;align-items:center;gap:12px;padding:11px 0;font-size:16px;min-height:44px;}
+.item input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent2);flex-shrink:0;}
+.item label{flex:1;}
 .item.chk label{text-decoration:line-through;color:var(--muted);}
-.tip{background:rgba(122,154,110,.12);border:1px solid var(--accent2);border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:14px;}
-.rbtn{background:none;border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;margin-top:6px;margin-right:6px;}
-.htog{font-size:12px;color:var(--accent);cursor:pointer;margin-top:4px;text-decoration:underline;}
-.hlist{font-size:12px;color:var(--muted);margin-top:4px;display:none;}
+.tip{background:rgba(122,154,110,.12);border:1px solid var(--accent2);border-radius:10px;padding:12px 14px;font-size:14px;margin-bottom:14px;line-height:1.4;}
+.rbtn{background:none;border:1px solid var(--border);color:var(--muted);padding:11px 16px;border-radius:8px;font-size:14px;min-height:44px;margin-top:6px;margin-right:6px;}
+.rbtn:active{opacity:.7;}
+.htog{font-size:13px;color:var(--accent);display:inline-block;padding:8px 0;margin-top:2px;text-decoration:underline;}
+.hlist{font-size:13px;color:var(--muted);margin-top:4px;display:none;}
 .hlist.open{display:block;}
-.hlist div{padding:2px 0;}
-.srow{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.stot{font-size:13px;color:var(--accent2);font-weight:600;margin-top:4px;}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#1a1612;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;}
+.hlist div{padding:4px 0;}
+.stot{font-size:14px;color:var(--accent2);font-weight:600;margin-top:2px;}
+.toast{position:fixed;bottom:calc(var(--navh) + 18px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--accent2);color:#1a1612;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;}
 .toast.show{opacity:1;}
-.grow{padding:10px 0;border-bottom:1px solid var(--border);}
+.grow{padding:12px 0;border-bottom:1px solid var(--border);}
 .grow:last-child{border-bottom:none;}
 .gtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;}
-.glbl{font-size:15px;font-weight:600;}.gtgt{font-size:12px;color:var(--accent);}
-.gcur{font-size:12px;color:var(--muted);margin-bottom:5px;}
-.barbg{background:#161310;border-radius:6px;height:8px;overflow:hidden;}
+.glbl{font-size:16px;font-weight:600;}.gtgt{font-size:13px;color:var(--accent);}
+.gcur{font-size:13px;color:var(--muted);margin-bottom:6px;}
+.barbg{background:#161310;border-radius:6px;height:9px;overflow:hidden;}
 .barfill{background:var(--accent2);height:100%;border-radius:6px;transition:width .4s;}
-.sbox{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
-.sbox textarea{width:100%;background:#161310;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px;font-size:11px;font-family:monospace;height:64px;resize:vertical;margin-top:6px;}
 </style>
 </head>
 <body>
 <h1>Comeback Tracker</h1>
 <div class="sub">Gym + keto restart · 90kg · 44yo · Vilnius</div>
 
-<div class="maintabs">
-  <div class="maintab active" data-view="workout">🏋️ Workout</div>
-  <div class="maintab" data-view="diet">🥑 Diet</div>
-  <div class="maintab" data-view="track">📈 Track</div>
-</div>
-
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:-10px;margin-bottom:10px;">
-  <div style="font-size:12px;">
-    <span class="htog" onclick="showExport()">⬇ Export backup</span>&nbsp;&nbsp;<span class="htog" onclick="showImport()">⬆ Import backup</span>
+<div class="topbar">
+  <div>
+    <span class="linkbtn" onclick="showExport()">⬇ Export</span>
+    <span class="linkbtn" onclick="showImport()">⬆ Import</span>
   </div>
   <div id="savedot" style="font-size:11px;color:var(--accent2);"></div>
 </div>
@@ -74,8 +89,8 @@ h1{font-size:20px;margin:4px 0 2px;color:var(--accent);}
 <!-- restore bar — only shown when there's no saved data, or opened manually via "Import backup" -->
 <div id="restorebar" class="card" style="margin-bottom:12px;display:none;">
   <div class="ml" style="margin-bottom:6px">📋 Paste your backup to restore logs</div>
-  <textarea id="restorein" placeholder="Paste backup string here..." style="width:100%;background:#161310;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px;font-size:11px;font-family:monospace;height:48px;resize:none;"></textarea>
-  <div style="display:flex;gap:8px;margin-top:8px;">
+  <textarea id="restorein" placeholder="Paste backup string here..." style="width:100%;font-family:monospace;height:64px;resize:none;"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px;">
     <button class="lbtn" onclick="restoreFromBackup(document.getElementById('restorein').value)">Restore</button>
     <button class="rbtn" style="margin:0" onclick="document.getElementById('restorebar').style.display='none'">Cancel</button>
   </div>
@@ -84,8 +99,8 @@ h1{font-size:20px;margin:4px 0 2px;color:var(--accent);}
 <!-- backup bar — opened manually via "Export backup" -->
 <div id="backupbar" style="display:none;background:#1e2a1e;border:1px solid var(--accent2);border-radius:10px;padding:12px;margin-bottom:12px;">
   <div class="ml" style="margin-bottom:6px;color:var(--accent2)">📋 Copy & save this backup string somewhere safe</div>
-  <textarea id="backuptext" readonly style="width:100%;background:#161310;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px;font-size:11px;font-family:monospace;height:48px;resize:none;"></textarea>
-  <div style="display:flex;gap:8px;margin-top:8px;">
+  <textarea id="backuptext" readonly style="width:100%;font-family:monospace;height:64px;resize:none;"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px;">
     <button class="lbtn" onclick="copyBackup()">Copy</button>
     <button class="rbtn" style="margin:0" onclick="document.getElementById('backupbar').style.display='none'">Hide</button>
   </div>
@@ -113,8 +128,10 @@ h1{font-size:20px;margin:4px 0 2px;color:var(--accent);}
   <div class="tip">Test ketones fasted AM. Weigh weekly, same conditions. Trust the trend.</div>
   <div class="card">
     <div class="en" style="margin-bottom:8px">Log Today</div>
-    <div class="einp" style="margin-bottom:8px"><input type="number" id="tw" placeholder="kg" step="0.1" style="width:80px"><span>body weight kg</span></div>
-    <div class="einp" style="margin-bottom:10px"><input type="number" id="tk" placeholder="mmol/L" step="0.1" style="width:80px"><span>ketones mmol/L</span></div>
+    <div class="setgrid" style="grid-template-columns:1fr 1fr;">
+      <label class="sfield"><span class="sflbl">Weight kg</span><input type="number" inputmode="decimal" id="tw" placeholder="0.0" step="0.1"></label>
+      <label class="sfield"><span class="sflbl">Ketones mmol/L</span><input type="number" inputmode="decimal" id="tk" placeholder="0.0" step="0.1"></label>
+    </div>
     <button class="lbtn" onclick="logTrack()">Log Entry</button>
   </div>
   <div class="stitle">Weight Trend</div>
@@ -125,6 +142,12 @@ h1{font-size:20px;margin:4px 0 2px;color:var(--accent);}
   <div class="card" id="track-hist"></div>
   <button class="rbtn" onclick="resetTrack()">Clear history</button>
 </div>
+</div>
+
+<div class="maintabs">
+  <div class="maintab active" data-view="workout"><span class="ic">🏋️</span><span>Workout</span></div>
+  <div class="maintab" data-view="diet"><span class="ic">🥑</span><span>Diet</span></div>
+  <div class="maintab" data-view="track"><span class="ic">📈</span><span>Track</span></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -328,7 +351,8 @@ function renderWorkoutCard(){
       const h=sg(key)||[];
       const last=h.length?`Last: ${h[h.length-1].date} — ${h[h.length-1].reps} reps`:'No entries yet';
       row.innerHTML=`<div class="en">${name}</div><div class="et">${target}</div>
-        <div class="einp"><input type="number" placeholder="reps" class="ir" style="width:80px"><span>max reps</span><button class="lbtn">Log</button></div>
+        <div class="setgrid" style="grid-template-columns:1fr;"><label class="sfield"><span class="sflbl">Max reps</span><input type="number" inputmode="numeric" placeholder="0" class="ir"></label></div>
+        <button class="lbtn">Log</button>
         <div class="ll">${last}</div>
         <div class="htog">Show history</div>
         <div class="hlist">${h.slice().reverse().map(e=>`<div>${e.date}: ${e.reps} reps</div>`).join('')||'<div>None yet</div>'}</div>`;
@@ -345,9 +369,9 @@ function renderWorkoutCard(){
     } else if(isMulti){
       const h=sg(key)||[];
       const last=h.length?`Last: ${h[h.length-1].date} — [${h[h.length-1].sets.join(', ')}] = ${h[h.length-1].total} total`:'No entries yet';
-      const sh=Array.from({length:5},(_,i)=>`<div class="srow"><span style="width:46px;font-size:13px;color:var(--muted)">Set ${i+1}</span><input type="number" placeholder="reps" class="sinp si"></div>`).join('');
+      const sh=Array.from({length:5},(_,i)=>`<div class="scell"><span class="sflbl">Set ${i+1}</span><input type="number" inputmode="numeric" placeholder="0" class="si"></div>`).join('');
       row.innerHTML=`<div class="en">${name}</div><div class="et">${target}</div>
-        ${sh}<div class="stot">Total: 0 reps</div>
+        <div class="setrow5">${sh}</div><div class="stot">Total: 0 reps</div>
         <button class="lbtn" style="margin-top:6px">Log All Sets</button>
         <div class="ll">${last}</div>
         <div class="htog">Show history</div>
@@ -371,12 +395,12 @@ function renderWorkoutCard(){
       const h=sg(key)||[];
       const last=h.length?`Last: ${h[h.length-1].date} — ${h[h.length-1].weight}kg x ${h[h.length-1].reps} x ${h[h.length-1].sets} sets`:'No entries yet';
       row.innerHTML=`<div class="en">${name}</div><div class="et">${target}</div>
-        <div class="einp">
-          <input type="number" placeholder="kg" class="ik" step="0.5"><span>kg x</span>
-          <input type="number" placeholder="reps" class="ir2"><span>x</span>
-          <input type="number" placeholder="sets" class="is"><span>sets</span>
-          <button class="lbtn">Log</button>
+        <div class="setgrid">
+          <label class="sfield"><span class="sflbl">KG</span><input type="number" inputmode="decimal" placeholder="0" class="ik" step="0.5"></label>
+          <label class="sfield"><span class="sflbl">Reps</span><input type="number" inputmode="numeric" placeholder="0" class="ir2"></label>
+          <label class="sfield"><span class="sflbl">Sets</span><input type="number" inputmode="numeric" placeholder="0" class="is"></label>
         </div>
+        <button class="lbtn">Log</button>
         <div class="ll">${last}</div>
         <div class="htog">Show history</div>
         <div class="hlist">${h.slice().reverse().map(e=>`<div>${e.date}: ${e.weight}kg x ${e.reps} x ${e.sets}s</div>`).join('')||'<div>None yet</div>'}</div>`;
