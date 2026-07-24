@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#1a1612">
 <title>Comeback Tracker</title>
 <style>
-:root{--bg:#1a1612;--card:#242018;--accent:#c9a86a;--accent2:#7a9a6e;--text:#ece6da;--muted:#a89c87;--border:#3a342a;--navh:64px;}
+:root{--bg:#1a1612;--card:#242018;--accent:#c9a86a;--accent2:#7a9a6e;--red:#b5694f;--text:#ece6da;--muted:#a89c87;--border:#3a342a;--navh:64px;}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{touch-action:manipulation;}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);
@@ -21,8 +21,8 @@ h1{font-size:21px;margin:4px 0 2px;color:var(--accent);}
 .linkbtn{font-size:12px;color:var(--accent);padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);display:inline-block;}
 .linkbtn:active{opacity:.7;}
 .maintabs{position:fixed;left:0;right:0;bottom:0;display:flex;gap:4px;background:var(--card);border-top:1px solid var(--border);padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:50;}
-.maintab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;padding:4px 2px;border-radius:12px;color:var(--muted);font-size:11px;font-weight:600;}
-.maintab .ic{font-size:21px;line-height:1;}
+.maintab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;padding:4px 2px;border-radius:12px;color:var(--muted);font-size:10px;font-weight:600;}
+.maintab .ic{font-size:20px;line-height:1;}
 .maintab.active{background:rgba(201,168,106,.14);color:var(--accent);}
 .maintab:active{opacity:.7;}
 .view{display:none;}.view.active{display:block;}
@@ -31,6 +31,8 @@ h1{font-size:21px;margin:4px 0 2px;color:var(--accent);}
 .tab.active{background:var(--accent2);color:#1a1612;border-color:var(--accent2);font-weight:600;}
 .tab:active{opacity:.8;}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.warn{background:rgba(181,105,79,.15);border:1px solid var(--red);border-radius:10px;padding:12px 14px;font-size:13px;color:#e8a090;margin-bottom:12px;line-height:1.4;}
+.warn strong{display:block;margin-bottom:4px;color:var(--red);font-size:14px;}
 .erow{display:grid;grid-template-columns:1fr;gap:6px;padding:12px 0;border-bottom:1px solid var(--border);}
 .erow:last-child{border-bottom:none;}
 .en{font-size:16px;font-weight:600;}.et{font-size:13px;color:var(--accent2);margin-bottom:2px;}
@@ -72,6 +74,14 @@ input:focus,textarea:focus{outline:1px solid var(--accent2);}
 .gcur{font-size:13px;color:var(--muted);margin-bottom:6px;}
 .barbg{background:#161310;border-radius:6px;height:9px;overflow:hidden;}
 .barfill{background:var(--accent2);height:100%;border-radius:6px;transition:width .4s;}
+.rehab-item{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.rehab-item:last-child{border-bottom:none;}
+.rehab-label{font-size:15px;font-weight:600;}
+.rehab-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.check-circle{width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.check-circle.done{background:var(--accent2);border-color:var(--accent2);color:#1a1612;}
+.rehab-hist-row{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.rehab-hist-row:last-child{border-bottom:none;}
 </style>
 </head>
 <body>
@@ -86,7 +96,6 @@ input:focus,textarea:focus{outline:1px solid var(--accent2);}
   <div id="savedot" style="font-size:11px;color:var(--accent2);"></div>
 </div>
 
-<!-- restore bar — only shown when there's no saved data, or opened manually via "Import backup" -->
 <div id="restorebar" class="card" style="margin-bottom:12px;display:none;">
   <div class="ml" style="margin-bottom:6px">📋 Paste your backup to restore logs</div>
   <textarea id="restorein" placeholder="Paste backup string here..." style="width:100%;font-family:monospace;height:64px;resize:none;"></textarea>
@@ -96,9 +105,8 @@ input:focus,textarea:focus{outline:1px solid var(--accent2);}
   </div>
 </div>
 
-<!-- backup bar — opened manually via "Export backup" -->
 <div id="backupbar" style="display:none;background:#1e2a1e;border:1px solid var(--accent2);border-radius:10px;padding:12px;margin-bottom:12px;">
-  <div class="ml" style="margin-bottom:6px;color:var(--accent2)">📋 Copy & save this backup string somewhere safe</div>
+  <div class="ml" style="margin-bottom:6px;color:var(--accent2)">📋 Copy &amp; save this backup string somewhere safe</div>
   <textarea id="backuptext" readonly style="width:100%;font-family:monospace;height:64px;resize:none;"></textarea>
   <div style="display:flex;gap:8px;margin-top:10px;">
     <button class="lbtn" onclick="copyBackup()">Copy</button>
@@ -106,15 +114,23 @@ input:focus,textarea:focus{outline:1px solid var(--accent2);}
   </div>
 </div>
 
+<!-- WORKOUT -->
 <div class="view active" id="view-workout">
-  <div class="tip">Old maxes: Squat 140 / Bench 130 / Pull-ups 25. Start ~65%, +2.5-5kg/week.</div>
+  <div class="tip">Old maxes: Squat 140 / Bench 130 / Pull-ups 25 · L5/S1 herniation — start ~65%, +2.5-5kg/week.</div>
   <div class="stitle">🎯 Goals</div>
   <div class="card" id="goals-card"></div>
   <div class="stabs" id="month-tabs"></div>
   <div class="stabs" id="day-tabs"></div>
+  <div id="back-warning" style="display:none">
+    <div class="warn">
+      <strong>⚠ L5/S1 Herniation — Banned exercises this session:</strong>
+      Deadlift · Back Squat · Romanian Deadlift · Bent-over Row (loose form) · Sit-ups · Any heavy axial spine loading. Stop immediately if you feel leg pain, numbness or tingling.
+    </div>
+  </div>
   <div id="workout-card"></div>
 </div>
 
+<!-- DIET -->
 <div class="view" id="view-diet">
   <div class="tip">2,450 kcal · 180g protein · 180g fat · 20-25g net carbs</div>
   <div class="stabs" id="diet-tabs"></div>
@@ -124,6 +140,7 @@ input:focus,textarea:focus{outline:1px solid var(--accent2);}
   <button class="rbtn" onclick="resetShopping()">Reset checklist</button>
 </div>
 
+<!-- TRACK -->
 <div class="view" id="view-track">
   <div class="tip">Test ketones fasted AM. Weigh weekly, same conditions. Trust the trend.</div>
   <div class="card">
@@ -138,24 +155,39 @@ input:focus,textarea:focus{outline:1px solid var(--accent2);}
   <div class="card"><canvas id="wc" height="140"></canvas><div class="ll" id="ws"></div></div>
   <div class="stitle">Ketone Trend</div>
   <div class="card"><canvas id="kc" height="140"></canvas><div class="ll" id="ks"></div></div>
+  <div class="stitle">Bench Press Trend</div>
+  <div class="card"><canvas id="bc" height="140"></canvas><div class="ll" id="bs"></div></div>
+  <div class="stitle">Pull-up Volume Trend</div>
+  <div class="card"><canvas id="pc" height="140"></canvas><div class="ll" id="ps"></div></div>
+  <div class="stitle">Leg Press Trend</div>
+  <div class="card"><canvas id="lpc" height="140"></canvas><div class="ll" id="lps"></div></div>
   <div class="stitle">History</div>
   <div class="card" id="track-hist"></div>
   <button class="rbtn" onclick="resetTrack()">Clear history</button>
 </div>
+
+<!-- REHAB -->
+<div class="view" id="view-rehab">
+  <div class="tip">Daily spine rehab for L5/S1. Do morning and evening. Consistency beats intensity.</div>
+  <div class="stitle">Today's Checklist</div>
+  <div class="card" id="rehab-card"></div>
+  <div class="stitle">Streak</div>
+  <div class="card" id="rehab-streak"></div>
+  <div class="stitle">History (14 days)</div>
+  <div class="card" id="rehab-hist"></div>
 </div>
 
 <div class="maintabs">
   <div class="maintab active" data-view="workout"><span class="ic">🏋️</span><span>Workout</span></div>
   <div class="maintab" data-view="diet"><span class="ic">🥑</span><span>Diet</span></div>
   <div class="maintab" data-view="track"><span class="ic">📈</span><span>Track</span></div>
+  <div class="maintab" data-view="rehab"><span class="ic">🏥</span><span>Rehab</span></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* === STORE === */
-/* Persisted to localStorage so logs survive across sessions on this device/browser.
-   Export/Import backup strings remain available for moving data between devices. */
+/* === STORE — localStorage so logs survive across sessions === */
 const STORAGE_KEY = 'comeback_tracker_db_v1';
 let DB = {};
 
@@ -163,32 +195,24 @@ function loadDB() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     DB = raw ? JSON.parse(raw) : {};
-  } catch(e) {
-    DB = {};
-  }
+  } catch(e) { DB = {}; }
 }
 
 function saveDB() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
     dot('✓ Saved');
-  } catch(e) {
-    dot('⚠ Save failed — storage full or blocked');
-  }
+  } catch(e) { dot('⚠ Save failed — storage full or blocked'); }
 }
 
-function makeBackup() {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(DB))));
-}
+function makeBackup() { return btoa(unescape(encodeURIComponent(JSON.stringify(DB)))); }
 
 function showExport() {
   document.getElementById('backuptext').value = makeBackup();
   document.getElementById('backupbar').style.display = 'block';
 }
 
-function showImport() {
-  document.getElementById('restorebar').style.display = 'block';
-}
+function showImport() { document.getElementById('restorebar').style.display = 'block'; }
 
 function dot(msg) {
   const el = document.getElementById('savedot');
@@ -204,7 +228,7 @@ function restoreFromBackup(str) {
     Object.assign(DB, decoded);
     saveDB();
     document.getElementById('restorebar').style.display = 'none';
-    renderWorkout(); renderDietCard(); renderShopping(); renderTrack(); renderGoals();
+    renderWorkout(); renderDietCard(); renderShopping(); renderTrack(); renderGoals(); renderRehab();
     dot('✓ Restored');
     toast('Data restored!');
   } catch(e) { toast('Invalid backup string'); }
@@ -212,20 +236,31 @@ function restoreFromBackup(str) {
 
 async function copyBackup() {
   const text = document.getElementById('backuptext').value;
-  try {
-    await navigator.clipboard.writeText(text);
-    toast('Backup copied!');
-  } catch(e) {
-    const el = document.getElementById('backuptext');
-    el.select(); document.execCommand('copy'); toast('Backup copied!');
-  }
+  try { await navigator.clipboard.writeText(text); toast('Backup copied!'); }
+  catch(e) { const el = document.getElementById('backuptext'); el.select(); document.execCommand('copy'); toast('Backup copied!'); }
 }
 
 function today(){return new Date().toISOString().slice(0,10);}
 function sk(s){return s.replace(/[^a-z0-9]/gi,'_');}
 function ek(m,d,n){return 'ex_'+sk(m)+'_'+sk(d)+'_'+sk(n);}
-
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1500);}
+
+/* === EXERCISE TYPE DETECTION === */
+const TIMED_EX=['Side Plank','Bird Dog','Half Cobra Extension','Glute Bridge Hold','Plank'];
+const CHECKBOX_EX=['Half Cobra + Cat-Cow','Mobility Work'];
+const ROUNDS_EX=['McGill Big 3 Circuit'];
+const WARN_DAYS={
+  'Month 2 (4x/week)':['Day 1 Lower','Day 3 Core Posterior']
+};
+
+function exType(name){
+  if(name.includes('Max Rep'))return 'maxrep';
+  if(name==='Pull-ups')return 'pullup';
+  if(TIMED_EX.includes(name))return 'timed';
+  if(CHECKBOX_EX.includes(name))return 'checkbox';
+  if(ROUNDS_EX.includes(name))return 'rounds';
+  return 'weighted';
+}
 
 /* === WORKOUT DATA === */
 const WP={
@@ -240,7 +275,7 @@ const WP={
     ],
     "Day B":[
       ["Deadlift","4x5 @ ~90kg"],
-      ["Overhead Press","4x6 moderate"],
+      ["Military Press","4x6 moderate"],
       ["Pull-ups","5 sets max reps"],
       ["Leg Press","3x10"],
       ["DB Incline Press","3x10"],
@@ -255,37 +290,48 @@ const WP={
       ["Side Plank","3x30s each side"]
     ]
   },
-  "Month 2+ (4x/week)":{
-    "Day 1 Lower Squat":[
-      ["Back Squat","5x5 heavy"],
-      ["Romanian Deadlift","3x8"],
-      ["Leg Press","3x10"],
-      ["Calf Raises","3x15"]
+  "Month 2 (4x/week)":{
+    "Day 1 Lower":[
+      ["Bird Dog","3x10 each side — neutral spine"],
+      ["Modified Curl-Up","3x10 — no neck strain"],
+      ["Side Plank","3x45s each side"],
+      ["Leg Press","4x10 — limited depth, neutral spine"],
+      ["DB Sumo Squat","4x10 — light to moderate"],
+      ["Calf Raises","3x15"],
+      ["Hip Thrust","3x12 — glutes, no spine load"],
+      ["Half Cobra Extension","3x2min — spine rehab"]
     ],
-    "Day 2 Upper Bench":[
-      ["Pull-ups Max Rep","1 set — max effort while fresh"],
-      ["Bench Press","5x5 heavy"],
-      ["Overhead Press","3x8"],
+    "Day 2 Upper Heavy":[
+      ["Pull-ups","5 sets max reps"],
+      ["Bench Press","5x5 — working toward goal"],
+      ["Military Press","4x6"],
+      ["DB Incline Press","3x10"],
+      ["Face Pulls","3x15"],
       ["Triceps Pushdown","3x12"]
     ],
-    "Day 3 Lower Deadlift":[
-      ["Deadlift","5x5 heavy"],
-      ["Bulgarian Split Squat","3x10/leg"],
-      ["Leg Curl","3x12"],
-      ["Core Circuit","3 rounds"]
+    "Day 3 Core Posterior":[
+      ["McGill Big 3 Circuit","3 rounds — Bird Dog, Curl-Up, Side Plank"],
+      ["Glute Bridge","3x15 — feet flat, drive hips up"],
+      ["Cable Pull-Through","3x12 — hip hinge, no spine flexion"],
+      ["Seated Leg Curl","3x12"],
+      ["Hanging Leg Raises","3x12 — controlled"],
+      ["Half Cobra + Cat-Cow","10 min mobility — end of session"]
     ],
     "Day 4 Upper Pull":[
-      ["Pull-ups","5 sets max reps"],
-      ["Barbell Rows","4x8"],
-      ["Incline DB Press","3x10"],
-      ["Biceps Curl","3x12"]
+      ["Pull-ups Max Rep","1 set — max effort fresh"],
+      ["Pull-ups","4 sets max reps"],
+      ["Barbell Row","4x8 — braced hip hinge, controlled"],
+      ["DB Shoulder Press","3x10"],
+      ["Cable Row","3x12"],
+      ["Biceps Curl","3x12"],
+      ["Rear Delt Flyes","3x15"]
     ]
   }
 };
 
 const GOALS=[
-  {label:"Bench Press",target:"8 x 100kg",names:["Bench Press"],type:"w",tR:8,tK:100},
-  {label:"Back Squat",target:"10 x 100kg",names:["Back Squat"],type:"w",tR:10,tK:100},
+  {label:"Bench Press",target:"8 × 100kg",names:["Bench Press"],type:"w",tR:8,tK:100},
+  {label:"Leg Press",target:"10 × 150kg",names:["Leg Press"],type:"w",tR:10,tK:150},
   {label:"Pull-ups",target:"20 reps bodyweight",names:["Pull-ups","Pull-ups Max Rep"],type:"p",tR:20}
 ];
 
@@ -307,6 +353,59 @@ const SHOP={
   "Other":["Berries (small amount)","Coffee"]
 };
 
+const REHAB_ITEMS=[
+  {id:'cobra_am',label:'Half Cobra',sub:'Morning — 3×2 min holds'},
+  {id:'cobra_pm',label:'Half Cobra',sub:'Evening — 3×2 min holds'},
+  {id:'catcow',label:'Cat-Cow',sub:'Morning — 10 slow reps'},
+  {id:'walk',label:'Walk',sub:'At least 30 min'}
+];
+
+/* === YOUTUBE HOW-TO LINKS === */
+const EX_LINKS={
+  "Bird Dog":"https://www.youtube.com/results?search_query=mcgill+bird+dog+exercise+spine+neutral",
+  "Modified Curl-Up":"https://www.youtube.com/results?search_query=mcgill+modified+curl+up+how+to",
+  "Side Plank":"https://www.youtube.com/results?search_query=side+plank+proper+form+mcgill",
+  "Half Cobra Extension":"https://www.youtube.com/results?search_query=mckenzie+press+up+cobra+herniated+disc+L5S1",
+  "Half Cobra + Cat-Cow":"https://www.youtube.com/results?search_query=half+cobra+cat+cow+spine+mobility+herniated+disc",
+  "McGill Big 3 Circuit":"https://www.youtube.com/results?search_query=mcgill+big+3+exercises+tutorial",
+  "Glute Bridge":"https://www.youtube.com/results?search_query=glute+bridge+proper+form+spine+neutral",
+  "Hip Thrust":"https://www.youtube.com/results?search_query=hip+thrust+proper+form+bret+contreras",
+  "Cable Pull-Through":"https://www.youtube.com/results?search_query=cable+pull+through+hip+hinge+form",
+  "Seated Leg Curl":"https://www.youtube.com/results?search_query=seated+leg+curl+machine+proper+form",
+  "Leg Press":"https://www.youtube.com/results?search_query=leg+press+proper+form+depth+spine",
+  "DB Sumo Squat":"https://www.youtube.com/results?search_query=dumbbell+sumo+squat+proper+form",
+  "Calf Raises":"https://www.youtube.com/results?search_query=standing+calf+raises+proper+form",
+  "Hanging Leg Raises":"https://www.youtube.com/results?search_query=hanging+leg+raises+proper+form+controlled",
+  "Pull-ups":"https://www.youtube.com/results?search_query=pull+ups+proper+form+full+range",
+  "Pull-ups Max Rep":"https://www.youtube.com/results?search_query=pull+ups+proper+form+full+range",
+  "Bench Press":"https://www.youtube.com/results?search_query=bench+press+proper+form+technique+setup",
+  "Military Press":"https://www.youtube.com/results?search_query=strict+military+press+overhead+press+form",
+  "DB Incline Press":"https://www.youtube.com/results?search_query=dumbbell+incline+press+proper+form",
+  "Face Pulls":"https://www.youtube.com/results?search_query=face+pulls+cable+proper+form+shoulder+health",
+  "Triceps Pushdown":"https://www.youtube.com/results?search_query=cable+triceps+pushdown+proper+form",
+  "Barbell Row":"https://www.youtube.com/results?search_query=barbell+row+braced+hip+hinge+form",
+  "DB Shoulder Press":"https://www.youtube.com/results?search_query=dumbbell+shoulder+press+seated+proper+form",
+  "Cable Row":"https://www.youtube.com/results?search_query=seated+cable+row+proper+form",
+  "Biceps Curl":"https://www.youtube.com/results?search_query=barbell+dumbbell+biceps+curl+proper+form",
+  "Rear Delt Flyes":"https://www.youtube.com/results?search_query=rear+delt+fly+dumbbell+form+technique",
+  "Back Squat":"https://www.youtube.com/results?search_query=back+squat+proper+form+depth+technique",
+  "Romanian Deadlift":"https://www.youtube.com/results?search_query=romanian+deadlift+proper+form+hip+hinge",
+  "Deadlift":"https://www.youtube.com/results?search_query=conventional+deadlift+proper+form+alan+thrall",
+  "Walking Lunges":"https://www.youtube.com/results?search_query=walking+lunges+proper+form+knee+tracking",
+  "Plank":"https://www.youtube.com/results?search_query=plank+proper+form+core+bracing"
+};
+
+function exLink(name){
+  const url=EX_LINKS[name];
+  if(!url)return '';
+  return ` <a href="${url}" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent);text-decoration:none;padding:2px 7px;border:1px solid var(--accent);border-radius:4px;vertical-align:middle;white-space:nowrap">▶ How</a>`;
+}
+
+function shouldWarn(){
+  const days=WARN_DAYS[cM];
+  return days&&days.includes(cD);
+}
+
 /* === MAIN TABS === */
 document.querySelectorAll('.maintab').forEach(tab=>{
   tab.addEventListener('click',()=>{
@@ -314,6 +413,8 @@ document.querySelectorAll('.maintab').forEach(tab=>{
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('view-'+tab.dataset.view).classList.add('active');
+    if(tab.dataset.view==='track')renderTrack();
+    if(tab.dataset.view==='rehab')renderRehab();
   });
 });
 
@@ -324,33 +425,32 @@ function renderMonthTabs(){
   const el=document.getElementById('month-tabs');el.innerHTML='';
   Object.keys(WP).forEach(m=>{
     const t=document.createElement('div');t.className='tab'+(m===cM?' active':'');t.textContent=m;
-    t.onclick=()=>{cM=m;cD=Object.keys(WP[m])[0];renderWorkout();};
-    el.appendChild(t);
+    t.onclick=()=>{cM=m;cD=Object.keys(WP[m])[0];renderWorkout();};el.appendChild(t);
   });
 }
 function renderDayTabs(){
   const el=document.getElementById('day-tabs');el.innerHTML='';
   Object.keys(WP[cM]).forEach(d=>{
     const t=document.createElement('div');t.className='tab'+(d===cD?' active':'');t.textContent=d;
-    t.onclick=()=>{cD=d;renderWorkout();};
-    el.appendChild(t);
+    t.onclick=()=>{cD=d;renderWorkout();};el.appendChild(t);
   });
 }
 
 function renderWorkoutCard(){
+  document.getElementById('back-warning').style.display=shouldWarn()?'block':'none';
   const con=document.getElementById('workout-card');con.innerHTML='';
   const card=document.createElement('div');card.className='card';con.appendChild(card);
 
   WP[cM][cD].forEach(([name,target])=>{
     const key=ek(cM,cD,name);
-    const isMax=name.includes('Max Rep');
-    const isMulti=name==='Pull-ups';
+    const type=exType(name);
     const row=document.createElement('div');row.className='erow';card.appendChild(row);
+    const hlink=exLink(name);
 
-    if(isMax){
+    if(type==='maxrep'){
       const h=sg(key)||[];
       const last=h.length?`Last: ${h[h.length-1].date} — ${h[h.length-1].reps} reps`:'No entries yet';
-      row.innerHTML=`<div class="en">${name}</div><div class="et">${target}</div>
+      row.innerHTML=`<div class="en">${name}${hlink}</div><div class="et">${target}</div>
         <div class="setgrid" style="grid-template-columns:1fr;"><label class="sfield"><span class="sflbl">Max reps</span><input type="number" inputmode="numeric" placeholder="0" class="ir"></label></div>
         <button class="lbtn">Log</button>
         <div class="ll">${last}</div>
@@ -366,11 +466,11 @@ function renderWorkoutCard(){
       };
       row.querySelector('.htog').onclick=()=>row.querySelector('.hlist').classList.toggle('open');
 
-    } else if(isMulti){
+    } else if(type==='pullup'){
       const h=sg(key)||[];
       const last=h.length?`Last: ${h[h.length-1].date} — [${h[h.length-1].sets.join(', ')}] = ${h[h.length-1].total} total`:'No entries yet';
       const sh=Array.from({length:5},(_,i)=>`<div class="scell"><span class="sflbl">Set ${i+1}</span><input type="number" inputmode="numeric" placeholder="0" class="si"></div>`).join('');
-      row.innerHTML=`<div class="en">${name}</div><div class="et">${target}</div>
+      row.innerHTML=`<div class="en">${name}${hlink}</div><div class="et">${target}</div>
         <div class="setrow5">${sh}</div><div class="stot">Total: 0 reps</div>
         <button class="lbtn" style="margin-top:6px">Log All Sets</button>
         <div class="ll">${last}</div>
@@ -391,26 +491,86 @@ function renderWorkoutCard(){
       };
       row.querySelector('.htog').onclick=()=>row.querySelector('.hlist').classList.toggle('open');
 
-    } else {
+    } else if(type==='timed'){
       const h=sg(key)||[];
-      const last=h.length?`Last: ${h[h.length-1].date} — ${h[h.length-1].weight}kg x ${h[h.length-1].reps} x ${h[h.length-1].sets} sets`:'No entries yet';
-      row.innerHTML=`<div class="en">${name}</div><div class="et">${target}</div>
-        <div class="setgrid">
-          <label class="sfield"><span class="sflbl">KG</span><input type="number" inputmode="decimal" placeholder="0" class="ik" step="0.5"></label>
-          <label class="sfield"><span class="sflbl">Reps</span><input type="number" inputmode="numeric" placeholder="0" class="ir2"></label>
-          <label class="sfield"><span class="sflbl">Sets</span><input type="number" inputmode="numeric" placeholder="0" class="is"></label>
+      const last=h.length?`Last: ${h[h.length-1].date} — ${h[h.length-1].sets}×${h[h.length-1].secs}s`:'No entries yet';
+      row.innerHTML=`<div class="en">${name}${hlink}</div><div class="et">${target}</div>
+        <div class="setgrid" style="grid-template-columns:1fr 1fr;">
+          <label class="sfield"><span class="sflbl">Seconds</span><input type="number" inputmode="numeric" placeholder="0" class="isec"></label>
+          <label class="sfield"><span class="sflbl">Sets</span><input type="number" inputmode="numeric" placeholder="0" class="iset2"></label>
         </div>
         <button class="lbtn">Log</button>
         <div class="ll">${last}</div>
         <div class="htog">Show history</div>
-        <div class="hlist">${h.slice().reverse().map(e=>`<div>${e.date}: ${e.weight}kg x ${e.reps} x ${e.sets}s</div>`).join('')||'<div>None yet</div>'}</div>`;
-      const ik=row.querySelector('.ik'),ir=row.querySelector('.ir2'),is=row.querySelector('.is');
+        <div class="hlist">${h.slice().reverse().map(e=>`<div>${e.date}: ${e.sets}×${e.secs}s</div>`).join('')||'<div>None yet</div>'}</div>`;
+      const isec=row.querySelector('.isec'),iset2=row.querySelector('.iset2');
       row.querySelector('.lbtn').onclick=()=>{
-        const w=parseFloat(ik.value),r=parseInt(ir.value),s=parseInt(is.value);
-        if(!w||!r||!s){toast('Fill kg, reps, sets');return;}
+        const s=parseInt(isec.value),sets=parseInt(iset2.value);
+        if(!s||!sets){toast('Enter seconds and sets');return;}
+        const h2=sg(key)||[];h2.push({date:today(),secs:s,sets});ss(key,h2);
+        row.querySelector('.ll').textContent=`Last: ${today()} — ${sets}×${s}s`;
+        row.querySelector('.hlist').innerHTML=h2.slice().reverse().map(e=>`<div>${e.date}: ${e.sets}×${e.secs}s</div>`).join('');
+        isec.value='';iset2.value='';toast('Logged '+name);
+      };
+      row.querySelector('.htog').onclick=()=>row.querySelector('.hlist').classList.toggle('open');
+
+    } else if(type==='checkbox'){
+      const h=sg(key)||[];
+      const last=h.length?`Last done: ${h[h.length-1].date}`:'Not logged yet';
+      row.innerHTML=`<div class="en">${name}${hlink}</div><div class="et">${target}</div>
+        <button class="lbtn" style="margin-top:4px">✓ Mark Done</button>
+        <div class="ll">${last}</div>
+        <div class="htog">Show history</div>
+        <div class="hlist">${h.slice().reverse().map(e=>`<div>${e.date}: done</div>`).join('')||'<div>None yet</div>'}</div>`;
+      row.querySelector('.lbtn').onclick=()=>{
+        const h2=sg(key)||[];h2.push({date:today()});ss(key,h2);
+        row.querySelector('.ll').textContent=`Last done: ${today()}`;
+        row.querySelector('.hlist').innerHTML=h2.slice().reverse().map(e=>`<div>${e.date}: done</div>`).join('');
+        toast('Logged '+name);
+      };
+      row.querySelector('.htog').onclick=()=>row.querySelector('.hlist').classList.toggle('open');
+
+    } else if(type==='rounds'){
+      const h=sg(key)||[];
+      const last=h.length?`Last: ${h[h.length-1].date} — ${h[h.length-1].rounds} rounds`:'No entries yet';
+      row.innerHTML=`<div class="en">${name}${hlink}</div><div class="et">${target}</div>
+        <div class="setgrid" style="grid-template-columns:1fr;">
+          <label class="sfield"><span class="sflbl">Rounds</span><input type="number" inputmode="numeric" placeholder="0" class="irounds"></label>
+        </div>
+        <button class="lbtn">Log</button>
+        <div class="ll">${last}</div>
+        <div class="htog">Show history</div>
+        <div class="hlist">${h.slice().reverse().map(e=>`<div>${e.date}: ${e.rounds} rounds</div>`).join('')||'<div>None yet</div>'}</div>`;
+      const inp=row.querySelector('.irounds');
+      row.querySelector('.lbtn').onclick=()=>{
+        const r=parseInt(inp.value);if(!r){toast('Enter rounds');return;}
+        const h2=sg(key)||[];h2.push({date:today(),rounds:r});ss(key,h2);
+        row.querySelector('.ll').textContent=`Last: ${today()} — ${r} rounds`;
+        row.querySelector('.hlist').innerHTML=h2.slice().reverse().map(e=>`<div>${e.date}: ${e.rounds} rounds</div>`).join('');
+        inp.value='';toast('Logged '+r+' rounds');
+      };
+      row.querySelector('.htog').onclick=()=>row.querySelector('.hlist').classList.toggle('open');
+
+    } else {
+      const h=sg(key)||[];
+      const last=h.length?`Last: ${h[h.length-1].date} — ${h[h.length-1].weight}kg × ${h[h.length-1].reps} × ${h[h.length-1].sets} sets`:'No entries yet';
+      row.innerHTML=`<div class="en">${name}${hlink}</div><div class="et">${target}</div>
+        <div class="setgrid">
+          <label class="sfield"><span class="sflbl">KG</span><input type="number" inputmode="decimal" placeholder="0" class="ik" step="0.5"></label>
+          <label class="sfield"><span class="sflbl">Reps</span><input type="number" inputmode="numeric" placeholder="0" class="ireps"></label>
+          <label class="sfield"><span class="sflbl">Sets</span><input type="number" inputmode="numeric" placeholder="0" class="isets"></label>
+        </div>
+        <button class="lbtn">Log</button>
+        <div class="ll">${last}</div>
+        <div class="htog">Show history</div>
+        <div class="hlist">${h.slice().reverse().map(e=>`<div>${e.date}: ${e.weight}kg × ${e.reps} × ${e.sets}s</div>`).join('')||'<div>None yet</div>'}</div>`;
+      const ik=row.querySelector('.ik'),ir=row.querySelector('.ireps'),is=row.querySelector('.isets');
+      row.querySelector('.lbtn').onclick=()=>{
+        const w=parseFloat(ik.value)||0,r=parseInt(ir.value),s=parseInt(is.value);
+        if(!r||!s){toast('Fill reps and sets');return;}
         const h2=sg(key)||[];h2.push({date:today(),weight:w,reps:r,sets:s});ss(key,h2);
-        row.querySelector('.ll').textContent=`Last: ${today()} — ${w}kg x ${r} x ${s} sets`;
-        row.querySelector('.hlist').innerHTML=h2.slice().reverse().map(e=>`<div>${e.date}: ${e.weight}kg x ${e.reps} x ${e.sets}s</div>`).join('');
+        row.querySelector('.ll').textContent=`Last: ${today()} — ${w}kg × ${r} × ${s} sets`;
+        row.querySelector('.hlist').innerHTML=h2.slice().reverse().map(e=>`<div>${e.date}: ${e.weight}kg × ${e.reps} × ${e.sets}s</div>`).join('');
         ik.value='';ir.value='';is.value='';
         toast('Logged '+name);renderGoals();
       };
@@ -431,13 +591,15 @@ function renderGoals(){
     if(all.length){
       if(g.type==='w'){
         const best=all.reduce((a,b)=>(b.weight>a.weight||(b.weight===a.weight&&b.reps>a.reps))?b:a);
-        txt=`Best: ${best.reps} x ${best.weight}kg (${best.date})`;
+        txt=`Best: ${best.reps} × ${best.weight}kg (${best.date})`;
         pct=best.weight>=g.tK?Math.min(best.reps/g.tR,1):(best.weight/g.tK)*0.85;
       } else {
         const fs=all.filter(e=>Array.isArray(e.sets)).flatMap(e=>e.sets);
         const fm=all.filter(e=>typeof e.reps==='number').map(e=>e.reps);
         const best=Math.max(...fs,...fm,0);
-        txt=`Best single set: ${best} reps`;pct=Math.min(best/g.tR,1);
+        const bestVol=all.filter(e=>e.total).reduce((a,b)=>b.total>a?b.total:a,0);
+        txt=`Best single set: ${best} reps`+(bestVol?` · Best volume: ${bestVol} total`:'');
+        pct=Math.min(best/g.tR,1);
       }
     }
     const row=document.createElement('div');row.className='grow';
@@ -486,7 +648,7 @@ function renderShopping(){
 }
 function resetShopping(){ss('shopping',{});renderShopping();}
 
-/* === TRACK === */
+/* === TRACK + CHARTS === */
 function drawChart(canvas,pts,color,unit){
   const w=canvas.width=canvas.clientWidth,h=canvas.height=140;
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,w,h);
@@ -503,14 +665,64 @@ function drawChart(canvas,pts,color,unit){
   ctx.fillStyle='#a89c87';ctx.font='11px sans-serif';
   ctx.fillText(mx.toFixed(1)+unit,2,pad-4);ctx.fillText(mn.toFixed(1)+unit,2,h-pad+12);
 }
+
+function getBenchHistory(){
+  const keys=[];
+  Object.keys(WP).forEach(m=>Object.keys(WP[m]).forEach(d=>{
+    WP[m][d].forEach(([n])=>{if(n==='Bench Press')keys.push(ek(m,d,n));});
+  }));
+  const map={};
+  [...new Set(keys)].forEach(k=>{
+    (sg(k)||[]).forEach(e=>{if(!map[e.date]||e.weight>map[e.date])map[e.date]=e.weight;});
+  });
+  return Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0])).map(([d,v])=>({v,d}));
+}
+
+function getPullupHistory(){
+  const keys=[];
+  Object.keys(WP).forEach(m=>Object.keys(WP[m]).forEach(d=>{
+    WP[m][d].forEach(([n])=>{if(n==='Pull-ups'||n==='Pull-ups Max Rep')keys.push(ek(m,d,n));});
+  }));
+  const map={};
+  [...new Set(keys)].forEach(k=>{
+    (sg(k)||[]).forEach(e=>{
+      const vol=e.total||(e.reps||0);
+      if(!map[e.date]||vol>map[e.date])map[e.date]=vol;
+    });
+  });
+  return Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0])).map(([d,v])=>({v,d}));
+}
+
+function getLegPressHistory(){
+  const keys=[];
+  Object.keys(WP).forEach(m=>Object.keys(WP[m]).forEach(d=>{
+    WP[m][d].forEach(([n])=>{if(n==='Leg Press')keys.push(ek(m,d,n));});
+  }));
+  const map={};
+  [...new Set(keys)].forEach(k=>{
+    (sg(k)||[]).forEach(e=>{if(!map[e.date]||e.weight>map[e.date])map[e.date]=e.weight;});
+  });
+  return Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0])).map(([d,v])=>({v,d}));
+}
+
 function renderTrack(){
   const hist=(sg('track-history')||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
   drawChart(document.getElementById('wc'),hist.filter(e=>e.weight!=null).map(e=>({v:e.weight})),'#c9a86a','kg');
   drawChart(document.getElementById('kc'),hist.filter(e=>e.ketones!=null).map(e=>({v:e.ketones})),'#7a9a6e','');
+  const bh=getBenchHistory();
+  drawChart(document.getElementById('bc'),bh,'#c9a86a','kg');
+  document.getElementById('bs').textContent=bh.length?`Latest: ${bh[bh.length-1].v}kg (${bh[bh.length-1].d})`:'';
+  const ph=getPullupHistory();
+  drawChart(document.getElementById('pc'),ph,'#7a9a6e','');
+  document.getElementById('ps').textContent=ph.length?`Latest: ${ph[ph.length-1].v} reps (${ph[ph.length-1].d})`:'';
+  const lh=getLegPressHistory();
+  drawChart(document.getElementById('lpc'),lh,'#8a7a9e','kg');
+  document.getElementById('lps').textContent=lh.length?`Latest: ${lh[lh.length-1].v}kg (${lh[lh.length-1].d})`:'';
   const wl=hist.filter(e=>e.weight!=null);document.getElementById('ws').textContent=wl.length?`Latest: ${wl[wl.length-1].weight}kg (${wl[wl.length-1].date})`:'';
   const kl=hist.filter(e=>e.ketones!=null);document.getElementById('ks').textContent=kl.length?`Latest: ${kl[kl.length-1].ketones} mmol/L (${kl[kl.length-1].date})`:'';
   document.getElementById('track-hist').innerHTML=hist.length?hist.slice().reverse().map(e=>`<div class="meal"><div class="ml">${e.date}</div><div class="mt">${e.weight!=null?e.weight+'kg':'--'}  |  ${e.ketones!=null?e.ketones+' mmol/L':'--'}</div></div>`).join(''):'<div class="ll">No entries yet</div>';
 }
+
 function logTrack(){
   const w=parseFloat(document.getElementById('tw').value);
   const k=parseFloat(document.getElementById('tk').value);
@@ -525,12 +737,77 @@ function logTrack(){
 }
 function resetTrack(){ss('track-history',[]);renderTrack();}
 
+/* === REHAB === */
+function renderRehab(){
+  const td=today();
+  const state=sg('rehab-'+td)||{};
+  const card=document.getElementById('rehab-card');card.innerHTML='';
+  REHAB_ITEMS.forEach(item=>{
+    const done=!!state[item.id];
+    const row=document.createElement('div');row.className='rehab-item';
+    row.innerHTML=`<div><div class="rehab-label">${item.label}</div><div class="rehab-sub">${item.sub}</div></div>
+      <div class="check-circle${done?' done':''}" data-id="${item.id}">${done?'✓':''}</div>`;
+    row.querySelector('.check-circle').onclick=function(){
+      const s=sg('rehab-'+td)||{};
+      s[item.id]=!s[item.id];
+      ss('rehab-'+td,s);
+      this.classList.toggle('done',s[item.id]);
+      this.textContent=s[item.id]?'✓':'';
+      renderRehabStreak();
+    };
+    card.appendChild(row);
+  });
+  renderRehabStreak();
+  renderRehabHist();
+}
+
+function dayComplete(ds){
+  const s=sg('rehab-'+ds)||{};
+  return REHAB_ITEMS.every(item=>s[item.id]);
+}
+
+function renderRehabStreak(){
+  const el=document.getElementById('rehab-streak');
+  let streak=0;
+  const d=new Date();
+  for(let i=0;i<60;i++){
+    const ds=d.toISOString().slice(0,10);
+    if(dayComplete(ds))streak++;
+    else if(i>0)break;
+    d.setDate(d.getDate()-1);
+  }
+  const td=today();
+  const s=sg('rehab-'+td)||{};
+  const done=REHAB_ITEMS.filter(item=>s[item.id]).length;
+  el.innerHTML=`<div style="text-align:center">
+    <div style="font-size:36px;font-weight:700;color:var(--accent)">${streak}</div>
+    <div style="font-size:14px;color:var(--muted)">day streak</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:8px">Today: ${done}/${REHAB_ITEMS.length} done</div>
+  </div>`;
+}
+
+function renderRehabHist(){
+  const el=document.getElementById('rehab-hist');el.innerHTML='';
+  for(let i=0;i<14;i++){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    const s=sg('rehab-'+ds)||{};
+    const done=REHAB_ITEMS.filter(item=>s[item.id]).length;
+    const col=done===REHAB_ITEMS.length?'var(--accent2)':done>0?'var(--accent)':'var(--border)';
+    const div=document.createElement('div');div.className='rehab-hist-row';
+    div.innerHTML=`<span style="color:var(--muted);flex:1">${ds}</span>
+      <span style="color:${col};font-size:16px;letter-spacing:2px">${'●'.repeat(done)}${'○'.repeat(REHAB_ITEMS.length-done)}</span>
+      <span style="color:var(--muted)">${done}/${REHAB_ITEMS.length}</span>`;
+    el.appendChild(div);
+  }
+}
+
 /* === INIT === */
 loadDB();
-if (!Object.keys(DB).length) {
-  document.getElementById('restorebar').style.display = 'block';
+if(!Object.keys(DB).length){
+  document.getElementById('restorebar').style.display='block';
 }
-renderWorkout();renderDietCard();renderShopping();renderTrack();renderGoals();
+renderWorkout();renderDietCard();renderShopping();renderTrack();renderGoals();renderRehab();
 </script>
 </body>
 </html>
