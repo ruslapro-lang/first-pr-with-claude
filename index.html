@@ -124,7 +124,7 @@ input:focus,textarea:focus{outline:1px solid var(--accent2);}
   <div id="back-warning" style="display:none">
     <div class="warn">
       <strong>⚠ L5/S1 Herniation — Banned exercises this session:</strong>
-      Deadlift · Back Squat · Romanian Deadlift · Bent-over Row (loose form) · Sit-ups · Any heavy axial spine loading. Stop immediately if you feel leg pain, numbness or tingling.
+      Deadlift · Back Squat · Romanian Deadlift · Barbell Bent-Over Row · Standing Overhead Press · Sit-ups · Any axial spine loading. Stop if you feel leg pain, numbness or tingling below knee.
     </div>
   </div>
   <div id="workout-card"></div>
@@ -276,7 +276,7 @@ const WP={
     "Day B":[
       ["Deadlift","4x5 @ ~90kg"],
       ["Military Press","4x6 moderate"],
-      ["Pull-ups","5 sets max reps"],
+      ["Pull-ups","5 sets × RPE 7 — stop 2-3 reps before failure"],
       ["Leg Press","3x10"],
       ["DB Incline Press","3x10"],
       ["Hanging Leg Raises","3x10"]
@@ -302,9 +302,9 @@ const WP={
       ["Half Cobra Extension","3x2min — spine rehab"]
     ],
     "Day 2 Upper Heavy":[
-      ["Pull-ups","5 sets max reps"],
-      ["Bench Press","5x5 — working toward goal"],
-      ["Military Press","4x6"],
+      ["Pull-ups","5 sets × RPE 7 — stop 2-3 reps before failure, controlled descent"],
+      ["Bench Press","5x5 @ RPE 7-8 — 1-2 reps in reserve, no back arch at failure"],
+      ["Seated DB Shoulder Press","4x6 — seated removes axial spine load"],
       ["DB Incline Press","3x10"],
       ["Face Pulls","3x15"],
       ["Triceps Pushdown","3x12"]
@@ -317,11 +317,11 @@ const WP={
       ["Hanging Leg Raises","3x12 — controlled"],
       ["Half Cobra + Cat-Cow","10 min mobility — end of session"]
     ],
-    "Day 4 Upper Pull":[
-      ["Pull-ups Max Rep","1 set — max effort fresh"],
-      ["Pull-ups","4 sets max reps"],
-      ["Barbell Row","4x8 — braced hip hinge, controlled"],
-      ["DB Shoulder Press","3x10"],
+    "Day 4 Upper Hypertrophy":[
+      ["Pull-ups Max Rep","1 set — max effort fresh, stop if form breaks"],
+      ["Pull-ups","4 sets × RPE 7 — stop 2-3 reps before failure, controlled descent"],
+      ["Chest-Supported DB Row","4x8 — chest on incline bench, spine fully unloaded"],
+      ["Seated DB Shoulder Press","3x10"],
       ["Cable Row","3x12"],
       ["Biceps Curl","3x12"],
       ["Rear Delt Flyes","3x15"]
@@ -384,7 +384,9 @@ const EX_LINKS={
   "Face Pulls":"https://www.youtube.com/results?search_query=face+pulls+cable+proper+form+shoulder+health",
   "Triceps Pushdown":"https://www.youtube.com/results?search_query=cable+triceps+pushdown+proper+form",
   "Barbell Row":"https://www.youtube.com/results?search_query=barbell+row+braced+hip+hinge+form",
+  "Chest-Supported DB Row":"https://www.youtube.com/results?search_query=chest+supported+dumbbell+row+incline+bench+form",
   "DB Shoulder Press":"https://www.youtube.com/results?search_query=dumbbell+shoulder+press+seated+proper+form",
+  "Seated DB Shoulder Press":"https://www.youtube.com/results?search_query=seated+dumbbell+shoulder+press+proper+form",
   "Cable Row":"https://www.youtube.com/results?search_query=seated+cable+row+proper+form",
   "Biceps Curl":"https://www.youtube.com/results?search_query=barbell+dumbbell+biceps+curl+proper+form",
   "Rear Delt Flyes":"https://www.youtube.com/results?search_query=rear+delt+fly+dumbbell+form+technique",
